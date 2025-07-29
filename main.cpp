@@ -37,6 +37,8 @@ int main()
 
          cin >> regA >> regB >> regC;
 
+         //Will add a section here to remove , from arguments
+
          cout << "RegA: " << regA << endl; //Will Replace later
          cout << "RegB: " << regB << endl;
          cout << "RegC: " << regC << endl;
