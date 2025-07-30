@@ -33,18 +33,40 @@ int main()
 
       //Could add a make lower case here for ease of use
 
-      if(opcode == "add" | opcode == "sub"){
+      if(opcode == "add" | opcode == "sub" | opcode == "addi" | opcode == "mult" | opcode == "les" | opcode == "eql"){
 
          cin >> regA >> regB >> regC;
-
-         //Will add a section here to remove , from arguments
 
          cout << "RegA: " << regA << endl; //Will Replace later
          cout << "RegB: " << regB << endl;
          cout << "RegC: " << regC << endl;
 
       }
-      //Will add more cases of commands with different arguements below :)
+      else if(opcode == "lw" | opcode == "sw"){
+
+         cin >> regA >> imed;
+
+         //Add section here to remove offset and store in a varible
+
+         cout << "RegA: " << regA << endl; //Will Replace later
+         cout << "Imed: " << imed << endl;
+
+      }
+      else if(opcode == "halt" | opcode == "nop"){
+
+         // valid command set varibles here:
+
+         //Set command to stop operation (halt)
+         //Set command to skip a loop (nop)
+
+      }
+      else{
+
+         cout << "Opcode not Valid" << endl;
+
+      }
+
+      //Will add a section here to remove , from arguments
 
       //Will be used to be the program running until halt add later
       program_running = 0;
