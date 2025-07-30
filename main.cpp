@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -26,6 +27,8 @@ int main()
       string regB;
       string regC;
       string imed;
+      string offset;
+      string ptr;
 
       cout << "> ";
       cin >> opcode;
@@ -44,12 +47,25 @@ int main()
       }
       else if(opcode == "lw" | opcode == "sw"){
 
+         //Expected Format is: lw gp, 8(gp)
+
          cin >> regA >> imed;
 
+         string openP = "(";
+         string closeP = ")";
+
          //Add section here to remove offset and store in a varible
+         auto posS = imed.find(openP);
+         auto posE = imed.find(closeP);
+         posE = posE - posS - 1;
+         offset = imed.substr(0,posS);
+         posS++;
+         ptr = imed.substr(posS,posE);
 
          cout << "RegA: " << regA << endl; //Will Replace later
          cout << "Imed: " << imed << endl;
+         cout << "Offset: " << offset << endl;
+         cout << "Ptr: " << ptr << endl;
 
       }
       else if(opcode == "halt" | opcode == "nop"){
