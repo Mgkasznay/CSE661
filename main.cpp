@@ -5,12 +5,16 @@
 
 using namespace std;
 
+//Program running value set false on a halt command
 bool program_running = 1;
 
-
+//Array containing the 32 registers. 31 general purpose registers r0-r30 and one memory pointer register r31 or gp
 string register_set[32];
+
+//Array containing Program data memory starting at memory address 0
 string program_memory[200];
 
+//ENUM for switch case used in generic function call
 enum opCode {
    ADD,
    ADDI,
@@ -25,8 +29,10 @@ enum opCode {
    DEFAULT
 };
 
+//Current Opcode the current opcode running
 opCode currentOpcode;
 
+//Generic opcode function runs the function value called for
 void generic_function(string opcode, string regA, string regB, string regC, string imed, string offset, string ptr){
 
    switch(currentOpcode){
@@ -98,7 +104,7 @@ int main()
    
    while(program_running){
 
-      //Starting Hello World Statement Remove Later
+      //###   For Debugging Will Remove later  ###
       vector<string> msg {"Hello", "CLASS", "For", "CSE661/CSI655", "and Homework 2!"};
 
       for (const string& word : msg)
@@ -108,85 +114,92 @@ int main()
       cout << endl;
 
       //Initial grab of the arguments
-      string opcode;
-      string regA;
-      string regB;
-      string regC;
-      string imed;
-      string offset;
-      string ptr;
+      string opcode; //Operation code used to determine which function is being called
+      string regA; //Register A the first register
+      string regB; //Register B the second register
+      string regC; //Register C the third register
+      string imed; //Imediate value
+      string offset; //Offset Value used in lw/sw for offset from a pointer
+      string ptr; //Pointer value for a memory location used in lw/sw
 
+      //Print the starting line charecter
       cout << "> ";
+      //Get the opcode from the command line
       cin >> opcode;
-      cout << "Opcode: " << opcode << endl; //Will replace with more useful code?
+      //###   For Debugging Will Remove later  ###
+      cout << "Opcode: " << opcode << endl; 
 
-      //Could add a make lower case here for ease of use
-
+      //Funtion in the format: opcode reg, reg, reg
+      //Example Format: add r1, r2, r3
       if(opcode == "add" | opcode == "sub" | opcode == "mult" | opcode == "les" | opcode == "eql"){
 
+         //Sets the value to the correct ENUM value for use later
          if(opcode == "add") currentOpcode = ADD;
          else if(opcode == "sub") currentOpcode = SUB;
          else if(opcode == "mult") currentOpcode = MULT;
          else if(opcode == "les") currentOpcode = LES;
          else currentOpcode = EQL;
 
+         //Pulls in the registers from the command line
          cin >> regA >> regB >> regC;
 
-         cout << "RegA: " << regA << endl; //Will Replace later
+         cout << "RegA: " << regA << endl; //###   For Debugging Will Remove later  ###
          cout << "RegB: " << regB << endl;
          cout << "RegC: " << regC << endl;
 
       }
+      //Checks if function is the format: opcode reg, imed, reg
+      //Example format: addi r1, 5, r2
       else if(opcode == "addi"){
 
+         //Gets the registers and imediate from the command line
          cin >> regA >> imed >> regC;
 
+         //Set the ENUM for the opcode
          currentOpcode = ADDI;
 
-         cout << "RegA: " << regA << endl; //Will Replace later
+         cout << "RegA: " << regA << endl; //###   For Debugging Will Remove later  ###
          cout << "Imed: " << imed << endl;
          cout << "RegC: " << regC << endl;
 
          //Will add a section here to remove , from arguments
 
       }
+      //checks if the function is in the format: opcode reg, offset(ptr)
+      //Example Format is: lw gp, 8(gp)
       else if(opcode == "lw" | opcode == "sw"){
 
+         //Set the ENUM value for the correct function
          if(opcode == "lw") currentOpcode = LW;
          else currentOpcode = SW;
 
-         //Expected Format is: lw gp, 8(gp)
-
+         //Gets the register and immiate value from the command line
          cin >> regA >> imed;
 
+         //Open and closed parathesis values
          string openP = "(";
          string closeP = ")";
 
-         //Remove offset and store in a varible
+         //Find the parathesis
          auto posS = imed.find(openP);
          auto posE = imed.find(closeP);
          posE = posE - posS - 1;
+         //Save just the offset value
          offset = imed.substr(0,posS);
          posS++;
+         //Save just the pointer value
          ptr = imed.substr(posS,posE);
 
-         cout << "RegA: " << regA << endl; //Will Replace later
+         cout << "RegA: " << regA << endl; //###   For Debugging Will Remove later  ###
          cout << "Imed: " << imed << endl;
          cout << "Offset: " << offset << endl;
          cout << "Ptr: " << ptr << endl;
 
       }
-      else if(opcode == "halt" | opcode == "nop"){
-
-         if(opcode == "halt") currentOpcode = HALT;
-         else currentOpcode = NOP;
-
-         // valid command set varibles here:
-
-         //Set command to stop operation (halt)
-         //Set command to skip a loop (nop)
-
-      }
+      //Save the ENUM value for halt and nop
+      else if(opcode == "halt") currentOpcode = HALT;
+      else if(opcode == "nop") currentOpcode = NOP;
+      //Else not a valid function value
       else{
 
          currentOpcode = DEFAULT;
@@ -194,10 +207,15 @@ int main()
 
       }
 
+      //Call the generic function
       generic_function(opcode, regA, regB, regC, imed, offset, ptr);
 
-      //Will be used to be the program running until halt add later
-      program_running = 0;
+      //The program running until halt
+      //Current opcode set to default to prep for next loop
+      currentOpcode = DEFAULT;
+
+
+      //program_running = 0;  //###   For Debugging Will Remove later  ###
 
    }
 }
