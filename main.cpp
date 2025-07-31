@@ -51,14 +51,32 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
       case LW:
          //Add Code Here
          break;
-      case SW:
+      case SW:{
          //Add Code Here
+            int regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
+            int ptrIndex = stoi(ptr.substr(1)); //gets the register index for the pointer and removes 'r'
+            int offsetValue = stoi(offset); //parse the offset value
+
+            int address = stoi(register_set[ptrIndex]) + offsetValue; //calculate the effective address by adding base register value and offset
+            if (address >= 0 && address < 200) { //if the address is greater than or equal to 0 and less than 200, the declared memory size
+               program_memory[address] = register_set[regIndexA]; 
+              cout << "Stored value " << register_set[regIndexA] << " from " << regA
+                  << " into memory [" << address << "]\n";  //stores the value from regA in the calculated memory address
+            } else {
+               cerr << "Error: memory access out of bounds.\n";// else if it's out of bounds
+            }
+         }
          break;
-      case HALT:
+      case HALT:{
          //Add Code Here
+         program_running = false; //set the main loop to false to stop the program
+         cout << "Program halted.\n";
+      }
          break;
-      case NOP:
+      case NOP:{
          //Add Code Here
+         cout << "No operation performed.\n";
+      }
          break;
       case DEFAULT:
          //Do nothing here
