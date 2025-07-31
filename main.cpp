@@ -67,6 +67,14 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
 
 }
 
+void print_reg_print_mem(){
+   // Do something
+}
+
+void opcode_to_hex(){
+   //Do something
+}
+
 int main()
 {
    
