@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <bits/stdc++.h>
+#include <sstream>
+#include <bitset>
 
 using namespace std;
 
@@ -93,9 +94,74 @@ void opcode_to_hex(){
    //Do something
 }
 
+// based on instruction, return a string that visually shows 32b hex equivalent
+// OPCODE (4 bits) + Register(5 bits) + Register(5 bits) + Register(5 bits) + Extra(13 bits)
+// example: instruction_to_hex(11, 1, 2, 3, 4, 5, 6) returns b0886004
+auto instruction_to_hex(unsigned int opcode, unsigned int regA, unsigned int regB, unsigned int regC, unsigned int imed, unsigned int offset, unsigned int ptr) {
+
+   // convert all to binary
+   // may need additional code here: ex. Lw r1, 8(gp) where regA = r1, regB = gp, imed = 8, ptr = gp
+
+   // show what was input
+   cout << "You input opcode: " << opcode << " regA: " << regA << " regB: " << regB << " regC: " << regC << " imed: " << imed << " offset: " << offset << " ptr: " << ptr << "\n";
+   // store 4 bits for opcode
+   bitset<4> op{opcode};
+   cout << "op: " << op << "\n";
+
+   // store 5 bits for register A, can be registers 0-31 in memory
+   bitset<5> rA{regA};
+   cout << "rA: " << rA << "\n";
+
+   // store 5 bits for register B, can be registers 0-31 in memory
+   bitset<5> rB{regB};
+   cout << "rB: " << rB << "\n";
+
+   // store 5 bits for register C, can be registers 0-31 in memory
+   bitset<5> rC{regC};
+   cout << "rC: " << rC << "\n";
+
+   // store 13 bits for immediate; if there is an offset, the value of the offset will be stored here
+   bitset<13> im{imed};
+   cout << "im: " << im << "\n";
+
+   cout << "string op: " << op << "\n";
+   string instruct_string{op.to_string() + rA.to_string() + rB.to_string() + rC.to_string() + im.to_string()};
+   cout << "instruct_string:" << instruct_string << "\n";
+
+   stringstream ss; // create string stream object
+   string result{}; // initalize string to store result
+
+   // for every four characters in instruct_string (aka 4 bits)...
+   for (int i = 0; i < instruct_string.length(); i = i + 4) {
+
+      // convert four character string to decimal (unsigned long integer), 
+      // then convert decimal to hex and store in string stream object
+      ss << hex << (bitset<4> {instruct_string.substr(i, 4)}).to_ulong() << "\n";
+
+      // convert string stream object to string, append to result string
+      result += ss.str();
+
+      // there is a new line at end of string. get rid of it
+      if (!result.empty() && result[result.length()-1] == '\n') {
+         result.erase(result.length()-1);
+      }   
+
+      // remove contents of string string object in prep for conversion of next four characters to hex
+      ss.str("");
+   }
+
+   // print resulting string, which visually shows hex
+   // cout << "result: " << result << "\n";
+
+   // return the hex string
+   return result;
+}
+
 int main()
 {
-   
+   // test instruction_to_hex()
+   cout << "test instruction_to_hex(), last line is return value: \n" << instruction_to_hex(11, 1, 2, 3, 4, 5, 6) << "\n";
+
    while(program_running){
 
       //Starting Hello World Statement Remove Later
