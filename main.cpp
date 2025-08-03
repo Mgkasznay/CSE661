@@ -102,35 +102,35 @@ void opcode_to_hex(){
 
 // based on instruction, return a string that visually shows 32b hex equivalent
 // OPCODE (4 bits) + Register(5 bits) + Register(5 bits) + Register(5 bits) + Extra(13 bits)
-// example: instruction_to_hex(11, 1, 2, 3, 4, 5, 6) returns b0886004
-auto instruction_to_hex(unsigned int opcode, unsigned int regA, unsigned int regB, unsigned int regC, unsigned int imed, unsigned int offset, unsigned int ptr) {
+// regC, imed, offset, ptr are optional parameters, default value = 0.
+// Example: instruction_to_hex(11, 1, 2, 3) -> b0886000
+// Example: instruction_to_hex(11, 1, 2, 0, 4, 5, 6) -> b0980005
+auto instruction_to_hex(unsigned int opcode, unsigned int regA, unsigned int regB, unsigned int regC = 0, unsigned int imed = 0, unsigned int offset = 0, unsigned int ptr = 0) {
 
-   // convert all to binary
-   // may need additional code here: ex. Lw r1, 8(gp) where regA = r1, regB = gp, imed = 8, ptr = gp
+   // if an offset or ptr value exists, value of imed = offset, value of regB = ptr
+   if (offset != 0) {
+      imed = offset;
+   }
 
-   // show what was input
-   cout << "You input opcode: " << opcode << " regA: " << regA << " regB: " << regB << " regC: " << regC << " imed: " << imed << " offset: " << offset << " ptr: " << ptr << "\n";
-   // store 4 bits for opcode
-   bitset<4> op{opcode};
-   cout << "op: " << op << "\n";
+   if (ptr != 0) {
+      regB = ptr;
+   }
 
-   // store 5 bits for register A, can be registers 0-31 in memory
-   bitset<5> rA{regA};
-   cout << "rA: " << rA << "\n";
+   // for debugging - print input, may remove later.
+   cout << "Your input values: opcode: " << opcode << " regA: " << regA << " regB: " << regB 
+      << " regC: " << regC << " imed: " << imed << " offset: " << offset << " ptr: " << ptr << "\n";
+   
+   // convert input values to binary
+   bitset<4> op{opcode};   // store 4 bits for opcode
+   bitset<5> rA{regA};     // store 5 bits for register A, can be registers 0-31 (00000-11111) in memory
+   bitset<5> rB{regB};     // same as register A
+   bitset<5> rC{regC};     // same as register A
+   bitset<13> im{imed};    // store 13 bits for immediate;
+   
+   // for debugging - print binary, may remove later.
+   cout << "Converted to binary: op: " << op << "\n" << "rA: " << rA << "\n" 
+      << "rB: " << rB << "\n" << "rC: " << rC << "\n" << "im: " << im << "\n";
 
-   // store 5 bits for register B, can be registers 0-31 in memory
-   bitset<5> rB{regB};
-   cout << "rB: " << rB << "\n";
-
-   // store 5 bits for register C, can be registers 0-31 in memory
-   bitset<5> rC{regC};
-   cout << "rC: " << rC << "\n";
-
-   // store 13 bits for immediate; if there is an offset, the value of the offset will be stored here
-   bitset<13> im{imed};
-   cout << "im: " << im << "\n";
-
-   cout << "string op: " << op << "\n";
    string instruct_string{op.to_string() + rA.to_string() + rB.to_string() + rC.to_string() + im.to_string()};
    cout << "instruct_string:" << instruct_string << "\n";
 
@@ -140,33 +140,102 @@ auto instruction_to_hex(unsigned int opcode, unsigned int regA, unsigned int reg
    // for every four characters in instruct_string (aka 4 bits)...
    for (int i = 0; i < instruct_string.length(); i = i + 4) {
 
-      // convert four character string to decimal (unsigned long integer), 
-      // then convert decimal to hex and store in string stream object
+      // convert 4-bits to decimal (unsigned long integer), then decimal to hex, then store in string stream object
       ss << hex << (bitset<4> {instruct_string.substr(i, 4)}).to_ulong() << "\n";
+      
+      result += ss.str();  // convert string stream object to string, append to result string
 
-      // convert string stream object to string, append to result string
-      result += ss.str();
-
-      // there is a new line at end of string. get rid of it
+      // remove new line at end of string
       if (!result.empty() && result[result.length()-1] == '\n') {
          result.erase(result.length()-1);
       }   
 
-      // remove contents of string string object in prep for conversion of next four characters to hex
+      // remove contents of string string object in prep for next 4-bit to hex conversion
       ss.str("");
    }
 
-   // print resulting string, which visually shows hex
-   // cout << "result: " << result << "\n";
+   return result; // return the hex string
+}
 
-   // return the hex string
-   return result;
+// exact opposite of instruction_to_hex: given 32bit hex string, return components of instruction (ie. opcode, register, etc.)
+// OPCODE (4 bits) + Register(5 bits) + Register(5 bits) + Register(5 bits) + Extra(13 bits)
+// possible values for "component" parameter: opcode, regA, regB, regC, imed, offset, ptr
+// Example: hex_to_instruction("b0886000", "opcode") -> 11
+// Example: hex_to_instruction("b0980005", "regA") -> 1
+string hex_to_instruction(string hex_string, string component) {
+
+   cout << "Your input: hex_string: " << hex_string << " requested component: " << component << "\n";
+   // convert hex to binary
+   string temp_hex_str = "0x" + hex_string;
+   stringstream ss;
+   ss << hex << temp_hex_str;    // convert hex string to unsigned int, store in string stream object
+   unsigned int hex_unsigned_int; // initialize variable to store unsigned int
+   ss >> hex_unsigned_int; // take contents of string stream object, assign to hex_unsigned_int
+   bitset<32> bin(hex_unsigned_int);   // store 32 bits for hex
+   string bin_str = bin.to_string();
+
+   cout << "Hex string converted to binary string: \n" << bin_str << "\n"; // convert to string
+
+   // separate binary string into components (opcode 4 bits, registerA 5 bits, etc), 
+   // then convert substrings to integer in decimal format, then convert back to string
+   string op = bin_str.substr(0, 4);                  // get binary string
+   string opcode = to_string(stoi(op, nullptr, 2));   // convert binary string to decimal integer, then convert back to string
+   string rA = bin_str.substr(4, 5);                  // etc.
+   string regA = to_string(stoi(rA, nullptr, 2));
+   string rB = bin_str.substr(9, 5); 
+   string regB = to_string(stoi(rB, nullptr, 2));
+   string rC = bin_str.substr(14,5); 
+   string regC = to_string(stoi(rC, nullptr, 2));
+   string im = bin_str.substr(19, 13); 
+   string imed = to_string(stoi(im, nullptr, 2));
+   string offset{};
+   string ptr{};
+
+   if (imed != "0") {
+      offset = imed;
+      ptr = regB; 
+   }
+
+   // for debugging, may remove later - output binary and decimal representations of opcode, registers, etc.
+   cout << "op: " << op << " opcode: " << opcode << "\n" << "rA: " << rA << " regA: " << regA << "\n"
+      << "rB: " << rB << " regB: " << regB << "\n" << "rC: " << rC << " regC: " << regC << "\n"
+      << "im: " << im << " imed: " << imed << "\n";
+
+   // return value of requested component
+   if (component == "opcode") {
+      return opcode;
+   }
+   else if (component == "regA") {
+      return regA;
+   }
+   else if (component == "regB") {
+      return regB;
+   }
+   else if (component == "regC") {
+      return regC;
+   }
+   else if (component == "imed") {
+      return imed;
+   }
+   else if (component == "offset") {
+      return offset;
+   }
+   else if (component == "ptr") {
+      return ptr;
+   } else {
+   return "Default.";
+   }
 }
 
 int main()
 {
    // test instruction_to_hex()
-   cout << "test instruction_to_hex(), last line is return value: \n" << instruction_to_hex(11, 1, 2, 3, 4, 5, 6) << "\n";
+   cout << "test instruction_to_hex(), last line is return value: \n" << instruction_to_hex(11, 1, 2, 3) << "\n";
+   cout << "test instruction_to_hex(), last line is return value: \n" << instruction_to_hex(11, 1, 2, 0, 4, 5, 6) << "\n";
+
+   // test hex_to_instruction()
+   cout << "test hex_to_instruction(), last line is return value: \n" << hex_to_instruction("b0886000", "opcode") << "\n";
+   cout << "test hex_to_instruction(), last line is return value: \n" << hex_to_instruction("b0980005", "regA") << "\n";
 
    while(program_running){
 
