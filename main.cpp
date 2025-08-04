@@ -120,7 +120,7 @@ void print_reg_print_mem(){
 void initilize_reg_mem(){
 
    for (int i = 0; i < 32; i++){
-      register_set[i] = to_string(i);
+      register_set[i] = "0";
    }
 
    for (int i = 0; i < 200; i++){
