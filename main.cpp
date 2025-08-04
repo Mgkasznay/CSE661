@@ -33,42 +33,75 @@ enum opCode {
 //Current Opcode the current opcode running
 opCode currentOpcode;
 
+int regIndexA, regIndexB, regIndexC, valB, valC, valA, result, regImed;
+
 //Generic opcode function runs the function value called for
 void generic_function(string opcode, string regA, string regB, string regC, string imed, string offset, string ptr){
 
    switch(currentOpcode){
       case ADD:
          {
-         int regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
-         int regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
-         int regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
+         regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
+         regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
+         regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
 
-         register_set[regIndexC] = to_string(stoi(register_set[regIndexA]) + stoi(register_set[regIndexB]));
+         valA = stoi(register_set[regIndexA]);
+         valB = stoi(register_set[regIndexB]);
 
+         result = valB + valA;
+         register_set[regIndexC] = to_string(result);
+
+         cout << "ADD: " << register_set[regIndexA] << " + " << register_set[regIndexB] << " = " << result << " stored in " << regC << "\n";
+         
          }
          break;
       case ADDI:
          {
-         int regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
-         int regIndexB = stoi(regB.substr(1)); //extract register number from regb and remove 'r'
-         int numImed = stoi(imed); //extract imeddiate number
+         regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
+         regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
+         regImed = stoi(imed); //extract register number from regC and remove 'r'
 
-         register_set[regIndexB] = to_string(stoi(register_set[regIndexA]) + numImed);
+         valB = stoi(register_set[regIndexB]);
+         valA = stoi(register_set[regIndexA]);
+
+         result = valA + regImed;
+         register_set[regIndexB] = to_string(result);
+
+         cout << "ADDI: " << register_set[regIndexA] << " + " << regImed << " = " << result << " stored in " << regB << "\n";
 
          }
          break;
       case SUB:
          {
-         int regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
-         int regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
-         int regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
+         regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
+         regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
+         regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
 
-         register_set[regIndexC] = to_string(stoi(register_set[regIndexA]) - stoi(register_set[regIndexB]));
+         valB = stoi(register_set[regIndexB]);
+         valC = stoi(register_set[regIndexC]);
+
+         result = valB - valC;
+         register_set[regIndexA] = to_string(result);
+
+         cout << "SUB: " << register_set[regIndexB] << " - " << register_set[regIndexC] << " = " << result << " stored in " << regA << "\n";
 
          }
          break;
       case MULT:
-         //Add Code Here
+         {
+         regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
+         regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
+         regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
+
+         valB = stoi(register_set[regIndexB]);
+         valC = stoi(register_set[regIndexC]);
+
+         result = valB * valC;
+         register_set[regIndexA] = to_string(result);
+
+         cout << "MULT: " << register_set[regIndexB] << " * " << register_set[regIndexC] << " = " << result << " stored in " << regA << "\n";
+
+         }
          break;
       case LES:
          //Add Code Here
@@ -81,7 +114,7 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
          break;
       case SW:{
          //Add Code Here
-            int regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
+            regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
             int ptrIndex = stoi(ptr.substr(1)); //gets the register index for the pointer and removes 'r'
             int offsetValue = stoi(offset); //parse the offset value
 
@@ -114,7 +147,21 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
 }
 
 void print_reg_print_mem(){
-   // Do something
+
+   cout << "\n ################################## \n";
+   cout << "\n Registers \n";
+   for (int i = 0; i< 32; i++){
+
+         cout << "r" << i << ": " << register_set[i] << "\n";
+   }
+
+   cout << "\n Memory \n";
+   for (int i = 0; i< 200; i++){
+
+         cout << "[" << i << "]: " << program_memory[i] << "\n";
+   }
+
+   cout << "\n ################################## \n";
 }
 
 void initilize_reg_mem(){
