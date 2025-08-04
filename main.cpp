@@ -38,13 +38,34 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
 
    switch(currentOpcode){
       case ADD:
-         //Add Code Here
+         {
+         int regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
+         int regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
+         int regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
+
+         register_set[regIndexC] = to_string(stoi(register_set[regIndexA]) + stoi(register_set[regIndexB]));
+
+         }
          break;
       case ADDI:
-         //Add Code Here
+         {
+         int regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
+         int regIndexB = stoi(regB.substr(1)); //extract register number from regb and remove 'r'
+         int numImed = stoi(imed); //extract imeddiate number
+
+         register_set[regIndexB] = to_string(stoi(register_set[regIndexA]) + numImed);
+
+         }
          break;
       case SUB:
-         //Add Code Here
+         {
+         int regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
+         int regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
+         int regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
+
+         register_set[regIndexC] = to_string(stoi(register_set[regIndexA]) - stoi(register_set[regIndexB]));
+
+         }
          break;
       case MULT:
          //Add Code Here
@@ -96,8 +117,15 @@ void print_reg_print_mem(){
    // Do something
 }
 
-void opcode_to_hex(){
-   //Do something
+void initilize_reg_mem(){
+
+   for (int i = 0; i < 32; i++){
+      register_set[i] = to_string(i);
+   }
+
+   for (int i = 0; i < 200; i++){
+      program_memory[i] = "0";
+   }
 }
 
 // based on instruction, return a string that visually shows 32b hex equivalent
@@ -237,6 +265,8 @@ int main()
    cout << "test hex_to_instruction(), last line is return value: \n" << hex_to_instruction("b0886000", "opcode") << "\n";
    cout << "test hex_to_instruction(), last line is return value: \n" << hex_to_instruction("b0980005", "regA") << "\n";
 
+   initilize_reg_mem();
+
    while(program_running){
 
       //###   For Debugging Will Remove later  ###
@@ -288,14 +318,14 @@ int main()
       else if(opcode == "addi"){
 
          //Gets the registers and imediate from the command line
-         cin >> regA >> imed >> regC;
+         cin >> regA >> regB >> imed;
 
          //Set the ENUM for the opcode
          currentOpcode = ADDI;
 
          cout << "RegA: " << regA << endl; //###   For Debugging Will Remove later  ###
          cout << "Imed: " << imed << endl;
-         cout << "RegC: " << regC << endl;
+         cout << "RegB: " << regB << endl;
 
          //Will add a section here to remove , from arguments
 
