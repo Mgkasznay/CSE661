@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <bitset>
+#include <iomanip>
 
 using namespace std;
 
@@ -38,13 +39,13 @@ int regIndexA, regIndexB, regIndexC, valB, valC, valA, result, regImed;
 void print_reg_print_mem(){
 
    cout << "\n ################################## \n";
-   cout << "\n Registers \n";
+   cout << "\n Registers: \n";
    for (int i = 0; i< 32; i++){
 
          cout << "r" << i << ": " << register_set[i] << " ";
    }
 
-   cout << "\n Memory \n";
+   cout << "\n Memory: \n";
    for (int i = 0; i< 200; i++){
 
          cout << "[" << i << "]: " << program_memory[i] << " ";
@@ -53,6 +54,27 @@ void print_reg_print_mem(){
    cout << "\n ################################## \n";
 }
 
+// converts decimal string to hex string (8 digits)
+string dec_to_hex(string str_decimal) {
+   
+   stringstream ss;  //create string stream object
+   string str_hex;   //initialize string to store hex
+
+   // convert string to decimal to hex, then output hex to ss object w/ 8 digits
+   ss << "0x" << setfill('0') << setw(8) << right << hex << stoi(str_decimal);
+   str_hex = ss.str();
+   ss.str("");
+   //cout << "dec: " << str_decimal << " hex: " << str_hex << "\n";
+   return str_hex;
+}
+
+// converts hex string to decimal string
+string hex_to_dec(string str_hex) {
+
+   string str_dec = to_string(stoi(str_hex.substr(2), nullptr, 16));
+   //cout << "hex: " << str_hex << " dec: " << str_dec << "\n";
+   return str_dec;
+}
 
 //Generic opcode function runs the function value called for
 void generic_function(string opcode, string regA, string regB, string regC, string imed, string offset, string ptr){
@@ -64,11 +86,12 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
          regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
          regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
 
-         valA = stoi(register_set[regIndexA]);
-         valB = stoi(register_set[regIndexB]);
+         valA = stoi(hex_to_dec(register_set[regIndexA])); //assume contents of register_set are in hex
+         valB = stoi(hex_to_dec(register_set[regIndexB])); //assume contents of register_set are in hex
 
          result = valB + valA;
-         register_set[regIndexC] = to_string(result);
+         
+         register_set[regIndexC] = dec_to_hex(to_string(result)); //convert to hex before storing in register
 
          cout << "ADD: " << register_set[regIndexA] << " + " << register_set[regIndexB] << " = " << result << " stored in " << regC << "\n";
          
@@ -80,11 +103,12 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
          regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
          regImed = stoi(imed); //extract register number from regC and remove 'r'
 
-         valB = stoi(register_set[regIndexB]);
-         valA = stoi(register_set[regIndexA]);
+         valB = stoi(hex_to_dec(register_set[regIndexB])); //assume contents of register_set are in hex
+         valA = stoi(hex_to_dec(register_set[regIndexA])); //assume contents of register_set are in hex
 
          result = valA + regImed;
-         register_set[regIndexB] = to_string(result);
+         
+         register_set[regIndexB] = dec_to_hex(to_string(result)); //convert to hex before storing in register
 
          cout << "ADDI: " << register_set[regIndexA] << " + " << regImed << " = " << result << " stored in " << regB << "\n";
 
@@ -96,11 +120,12 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
          regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
          regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
 
-         valA = stoi(register_set[regIndexA]);
-         valB = stoi(register_set[regIndexB]);
+         valA = stoi(hex_to_dec(register_set[regIndexA])); //assume contents of register_set are in hex
+         valB = stoi(hex_to_dec(register_set[regIndexB])); //assume contents of register_set are in hex
 
          result = valA - valB;
-         register_set[regIndexC] = to_string(result);
+         
+         register_set[regIndexC] = dec_to_hex(to_string(result)); //convert to hex before storing in register
 
          cout << "SUB: " << register_set[regIndexA] << " - " << register_set[regIndexB] << " = " << result << " stored in " << regC << "\n";
 
@@ -112,11 +137,12 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
          regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
          regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
 
-         valA = stoi(register_set[regIndexA]);
-         valB = stoi(register_set[regIndexB]);
+         valA = stoi(hex_to_dec(register_set[regIndexA])); //assume contents of register_set are in hex
+         valB = stoi(hex_to_dec(register_set[regIndexB])); //assume contents of register_set are in hex
 
          result = valB * valA;
-         register_set[regIndexC] = to_string(result);
+
+         register_set[regIndexC] = dec_to_hex(to_string(result)); //convert to hex before storing in register
 
          cout << "MULT: " << register_set[regIndexA] << " * " << register_set[regIndexB] << " = " << result << " stored in " << regC << "\n";
 
@@ -128,13 +154,14 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
          regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
          regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
 
-         valA = stoi(register_set[regIndexA]);
-         valB = stoi(register_set[regIndexB]);
+         valA = stoi(hex_to_dec(register_set[regIndexA])); //assume contents of register_set are in hex
+         valB = stoi(hex_to_dec(register_set[regIndexB])); //assume contents of register_set are in hex
 
          bool comp = false;
 
          if (valA < valB) comp = true;
-         register_set[regIndexC] = to_string(comp);
+         
+         register_set[regIndexC] = dec_to_hex(to_string(comp)); //convert to hex before storing in register
 
          cout << "LES: " << register_set[regIndexA] << " < " << register_set[regIndexB] << " = " << comp << " stored in " << regC << "\n";
 
@@ -146,13 +173,14 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
          regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
          regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
 
-         valA = stoi(register_set[regIndexA]);
-         valB = stoi(register_set[regIndexB]);
+         valA = stoi(hex_to_dec(register_set[regIndexA])); //assume contents of register_set are in hex
+         valB = stoi(hex_to_dec(register_set[regIndexB])); //assume contents of register_set are in hex
 
          bool comp = false;
 
          if (valA == valB) comp = true;
-         register_set[regIndexC] = to_string(comp);
+
+         register_set[regIndexC] = dec_to_hex(to_string(comp)); //convert to hex before storing in register
 
          cout << "EQL: " << register_set[regIndexA] << " == " << register_set[regIndexB] << " = " << comp << " stored in " << regC << "\n";
 
@@ -164,7 +192,9 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
             int ptrIndex = stoi(ptr.substr(1)); //gets the register index for the pointer and removes 'r'
             int offsetValue = stoi(offset); //parse the offset value
 
-            int address = stoi(register_set[ptrIndex]) + offsetValue; //calculate the effective address by adding base register value and offset
+            //calculate the effective address by adding base register value and offset
+            int address = stoi(hex_to_dec(register_set[ptrIndex])) + offsetValue; //assume contents of register_set are in hex
+
             if (address >= 0 && address < 200) { //if the address is greater than or equal to 0 and less than 200, the declared memory size
                register_set[regIndexA] = program_memory[address]; 
               cout << "Loaded value " << register_set[regIndexA] << " from " << program_memory[address]
@@ -179,7 +209,9 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
             int ptrIndex = stoi(ptr.substr(1)); //gets the register index for the pointer and removes 'r'
             int offsetValue = stoi(offset); //parse the offset value
 
-            int address = stoi(register_set[ptrIndex]) + offsetValue; //calculate the effective address by adding base register value and offset
+            //calculate the effective address by adding base register value and offset
+            int address = stoi(hex_to_dec(register_set[ptrIndex])) + offsetValue; //assume contents of register_set are in hex
+
             if (address >= 0 && address < 200) { //if the address is greater than or equal to 0 and less than 200, the declared memory size
                program_memory[address] = register_set[regIndexA]; 
               cout << "Stored value " << register_set[regIndexA] << " from " << regA
@@ -210,55 +242,42 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
 void initilize_reg_mem(){
 
    for (int i = 0; i < 32; i++){
-      register_set[i] = "0";
+      register_set[i] = "0x00000000";
    }
 
    for (int i = 0; i < 200; i++){
-      program_memory[i] = "0";
+      program_memory[i] = "0x00000000";
    }
 }
 
-// based on instruction, return a string that visually shows 32b hex equivalent
-// OPCODE (4 bits) + Register(5 bits) + Register(5 bits) + Register(5 bits) + Extra(13 bits)
+// Outputs and returns instruction format in 8 digit hex: OPCODE(4 bits) + Register(5 bits) + Register(5 bits) + Register(5 bits) + Extra(13 bits)
 // regC, imed, offset, ptr are optional parameters, default value = 0.
-// Example: instruction_to_hex(11, 1, 2, 3) -> b0886000
-// Example: instruction_to_hex(11, 1, 2, 0, 4, 5, 6) -> b0980005
-auto instruction_to_hex(unsigned int opcode, unsigned int regA, unsigned int regB, unsigned int regC = 0, unsigned int imed = 0, unsigned int offset = 0, unsigned int ptr = 0) {
+auto instruction_to_hex(string opcode, string regA, string regB, string regC = "0", string imed = "0", string offset = "0", string ptr = "0") {
 
    // if an offset or ptr value exists, value of imed = offset, value of regB = ptr
-   if (offset != 0) {
+   if (stoi(offset) != 0) {
       imed = offset;
    }
 
-   if (ptr != 0) {
+   if (stoi(ptr.substr(1)) != 0) {
       regB = ptr;
    }
-
-   // for debugging - print input, may remove later.
-   cout << "Your input values: opcode: " << opcode << " regA: " << regA << " regB: " << regB 
-      << " regC: " << regC << " imed: " << imed << " offset: " << offset << " ptr: " << ptr << "\n";
    
    // convert input values to binary
-   bitset<4> op{opcode};   // store 4 bits for opcode
-   bitset<5> rA{regA};     // store 5 bits for register A, can be registers 0-31 (00000-11111) in memory
-   bitset<5> rB{regB};     // same as register A
-   bitset<5> rC{regC};     // same as register A
-   bitset<13> im{imed};    // store 13 bits for immediate;
-   
-   // for debugging - print binary, may remove later.
-   cout << "Converted to binary: op: " << op << "\n" << "rA: " << rA << "\n" 
-      << "rB: " << rB << "\n" << "rC: " << rC << "\n" << "im: " << im << "\n";
+   bitset<4> op{(unsigned int)stoi((opcode))};           // store 4 bits for opcode
+   bitset<5> rA{(unsigned int)stoi(regA.substr(1))};     // store 5 bits for register A, can be registers 0-31 (00000-11111) in memory
+   bitset<5> rB{(unsigned int)stoi(regB.substr(1))};     // same as register A
+   bitset<5> rC{(unsigned int)stoi(regC.substr(1))};     // same as register A
+   bitset<13> im{(unsigned int)stoi(imed)};                            // store 13 bits for immediate;
 
    string instruct_string{op.to_string() + rA.to_string() + rB.to_string() + rC.to_string() + im.to_string()};
-   cout << "instruct_string:" << instruct_string << "\n";
-
    stringstream ss; // create string stream object
    string result{}; // initalize string to store result
 
    // for every four characters in instruct_string (aka 4 bits)...
    for (int i = 0; i < instruct_string.length(); i = i + 4) {
 
-      // convert 4-bits to decimal (unsigned long integer), then decimal to hex, then store in string stream object
+      // convert 4-bits to decimal (unsigned int), then decimal to hex, then store in string stream object
       ss << hex << (bitset<4> {instruct_string.substr(i, 4)}).to_ulong() << "\n";
       
       result += ss.str();  // convert string stream object to string, append to result string
@@ -271,100 +290,15 @@ auto instruction_to_hex(unsigned int opcode, unsigned int regA, unsigned int reg
       // remove contents of string string object in prep for next 4-bit to hex conversion
       ss.str("");
    }
-
-   return result; // return the hex string
-}
-
-// exact opposite of instruction_to_hex: given 32bit hex string, return components of instruction (ie. opcode, register, etc.)
-// OPCODE (4 bits) + Register(5 bits) + Register(5 bits) + Register(5 bits) + Extra(13 bits)
-// possible values for "component" parameter: opcode, regA, regB, regC, imed, offset, ptr
-// Example: hex_to_instruction("b0886000", "opcode") -> 11
-// Example: hex_to_instruction("b0980005", "regA") -> 1
-string hex_to_instruction(string hex_string, string component) {
-
-   cout << "Your input: hex_string: " << hex_string << " requested component: " << component << "\n";
-   // convert hex to binary
-   string temp_hex_str = "0x" + hex_string;
-   stringstream ss;
-   ss << hex << temp_hex_str;    // convert hex string to unsigned int, store in string stream object
-   unsigned int hex_unsigned_int; // initialize variable to store unsigned int
-   ss >> hex_unsigned_int; // take contents of string stream object, assign to hex_unsigned_int
-   bitset<32> bin(hex_unsigned_int);   // store 32 bits for hex
-   string bin_str = bin.to_string();
-
-   cout << "Hex string converted to binary string: \n" << bin_str << "\n"; // convert to string
-
-   // separate binary string into components (opcode 4 bits, registerA 5 bits, etc), 
-   // then convert substrings to integer in decimal format, then convert back to string
-   string op = bin_str.substr(0, 4);                  // get binary string
-   string opcode = to_string(stoi(op, nullptr, 2));   // convert binary string to decimal integer, then convert back to string
-   string rA = bin_str.substr(4, 5);                  // etc.
-   string regA = to_string(stoi(rA, nullptr, 2));
-   string rB = bin_str.substr(9, 5); 
-   string regB = to_string(stoi(rB, nullptr, 2));
-   string rC = bin_str.substr(14,5); 
-   string regC = to_string(stoi(rC, nullptr, 2));
-   string im = bin_str.substr(19, 13); 
-   string imed = to_string(stoi(im, nullptr, 2));
-   string offset{};
-   string ptr{};
-
-   if (imed != "0") {
-      offset = imed;
-      ptr = regB; 
-   }
-
-   // for debugging, may remove later - output binary and decimal representations of opcode, registers, etc.
-   cout << "op: " << op << " opcode: " << opcode << "\n" << "rA: " << rA << " regA: " << regA << "\n"
-      << "rB: " << rB << " regB: " << regB << "\n" << "rC: " << rC << " regC: " << regC << "\n"
-      << "im: " << im << " imed: " << imed << "\n";
-
-   // return value of requested component
-   if (component == "opcode") {
-      return opcode;
-   }
-   else if (component == "regA") {
-      return regA;
-   }
-   else if (component == "regB") {
-      return regB;
-   }
-   else if (component == "regC") {
-      return regC;
-   }
-   else if (component == "imed") {
-      return imed;
-   }
-   else if (component == "offset") {
-      return offset;
-   }
-   else if (component == "ptr") {
-      return ptr;
-   } else {
-   return "Default.";
-   }
+   string str_hex = "0x" + result;
+   cout << "Instruction Format: \n" << str_hex << "\n";
+   cout << "\n ################################## \n";
+   return str_hex; // return the hex string as 0x00000000
 }
 
 int main()
 {
-   // test instruction_to_hex()
-   cout << "test instruction_to_hex(), last line is return value: \n" << instruction_to_hex(11, 1, 2, 3) << "\n";
-   cout << "test instruction_to_hex(), last line is return value: \n" << instruction_to_hex(11, 1, 2, 0, 4, 5, 6) << "\n";
-
-   // test hex_to_instruction()
-   cout << "test hex_to_instruction(), last line is return value: \n" << hex_to_instruction("b0886000", "opcode") << "\n";
-   cout << "test hex_to_instruction(), last line is return value: \n" << hex_to_instruction("b0980005", "regA") << "\n";
-
    initilize_reg_mem();
-
-   //Initial grab of the arguments
-   string opcode = "00000000"; //Operation code used to determine which function is being called
-   string regA = "00000000"; //Register A the first register
-   string regB = "00000000"; //Register B the second register
-   string regC = "00000000"; //Register C the third register
-   string imed = "00000000"; //Imediate value
-   string offset = "00000000"; //Offset Value used in lw/sw for offset from a pointer
-   string ptr = "00000000"; //Pointer value for a memory location used in lw/sw
 
    while(program_running){
 
@@ -377,6 +311,15 @@ int main()
       }
       cout << endl;
 
+      //Initial grab of the arguments
+      string opcode = "00000000"; //Operation code used to determine which function is being called
+      string regA = "00000000"; //Register A the first register
+      string regB = "00000000"; //Register B the second register
+      string regC = "00000000"; //Register C the third register
+      string imed = "00000000"; //Imediate value
+      string offset = "00000000"; //Offset Value used in lw/sw for offset from a pointer
+      string ptr = "00000000"; //Pointer value for a memory location used in lw/sw
+      
       //Print the starting line charecter
       cout << "> ";
       //Get the opcode from the command line
@@ -464,9 +407,7 @@ int main()
 
       //Call the generic function
       generic_function(opcode, regA, regB, regC, imed, offset, ptr);
-
-      string insOpcode = to_string(currentOpcode);
-      instruction_to_hex((unsigned int) stoi(insOpcode), (unsigned int) stoi(regA.substr(1)), (unsigned int) stoi(regB.substr(1)), (unsigned int) stoi(regC.substr(1)), (unsigned int) stoi(imed), (unsigned int) stoi(offset), (unsigned int) stoi(ptr.substr(1)));
+      instruction_to_hex(to_string(currentOpcode), regA, regB, regC, imed, offset, ptr);
 
       //The program running until halt
       //Current opcode set to default to prep for next loop
