@@ -35,6 +35,25 @@ opCode currentOpcode;
 
 int regIndexA, regIndexB, regIndexC, valB, valC, valA, result, regImed;
 
+void print_reg_print_mem(){
+
+   cout << "\n ################################## \n";
+   cout << "\n Registers \n";
+   for (int i = 0; i< 32; i++){
+
+         cout << "r" << i << ": " << register_set[i] << "\n";
+   }
+
+   cout << "\n Memory \n";
+   for (int i = 0; i< 200; i++){
+
+         cout << "[" << i << "]: " << program_memory[i] << "\n";
+   }
+
+   cout << "\n ################################## \n";
+}
+
+
 //Generic opcode function runs the function value called for
 void generic_function(string opcode, string regA, string regB, string regC, string imed, string offset, string ptr){
 
@@ -110,7 +129,21 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
          //Add Code Here
          break;
       case LW:
+         /*{
          //Add Code Here
+            regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
+            int ptrIndex = stoi(ptr.substr(1)); //gets the register index for the pointer and removes 'r'
+            int offsetValue = stoi(offset); //parse the offset value
+
+            int address = stoi(register_set[ptrIndex]) + offsetValue; //calculate the effective address by adding base register value and offset
+            if (address >= 0 && address < 200) { //if the address is greater than or equal to 0 and less than 200, the declared memory size
+               register_set[regIndexA] = program_memory[address]; 
+              cout << "Loaded value " << register_set[regIndexA] << " from " << program_memory[address]
+                  << " into memory [" << address << "]\n";  //stores the value from regA in the calculated memory address
+            } else {
+               cerr << "Error: memory access out of bounds.\n";// else if it's out of bounds
+            }
+         }*/
          break;
       case SW:{
          //Add Code Here
@@ -144,24 +177,8 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
          break;
    }
 
-}
+   print_reg_print_mem();
 
-void print_reg_print_mem(){
-
-   cout << "\n ################################## \n";
-   cout << "\n Registers \n";
-   for (int i = 0; i< 32; i++){
-
-         cout << "r" << i << ": " << register_set[i] << "\n";
-   }
-
-   cout << "\n Memory \n";
-   for (int i = 0; i< 200; i++){
-
-         cout << "[" << i << "]: " << program_memory[i] << "\n";
-   }
-
-   cout << "\n ################################## \n";
 }
 
 void initilize_reg_mem(){
@@ -314,6 +331,15 @@ int main()
 
    initilize_reg_mem();
 
+   //Initial grab of the arguments
+   string opcode = "00000000"; //Operation code used to determine which function is being called
+   string regA = "00000000"; //Register A the first register
+   string regB = "00000000"; //Register B the second register
+   string regC = "00000000"; //Register C the third register
+   string imed = "00000000"; //Imediate value
+   string offset = "00000000"; //Offset Value used in lw/sw for offset from a pointer
+   string ptr = "00000000"; //Pointer value for a memory location used in lw/sw
+
    while(program_running){
 
       //###   For Debugging Will Remove later  ###
@@ -324,15 +350,6 @@ int main()
          cout << word << " ";
       }
       cout << endl;
-
-      //Initial grab of the arguments
-      string opcode; //Operation code used to determine which function is being called
-      string regA; //Register A the first register
-      string regB; //Register B the second register
-      string regC; //Register C the third register
-      string imed; //Imediate value
-      string offset; //Offset Value used in lw/sw for offset from a pointer
-      string ptr; //Pointer value for a memory location used in lw/sw
 
       //Print the starting line charecter
       cout << "> ";
@@ -421,6 +438,9 @@ int main()
 
       //Call the generic function
       generic_function(opcode, regA, regB, regC, imed, offset, ptr);
+
+      string insOpcode = to_string(currentOpcode);
+      instruction_to_hex((unsigned int) stoi(insOpcode), (unsigned int) stoi(regA.substr(1)), (unsigned int) stoi(regB.substr(1)), (unsigned int) stoi(regC.substr(1)), (unsigned int) stoi(imed), (unsigned int) stoi(offset), (unsigned int) stoi(ptr.substr(1)));
 
       //The program running until halt
       //Current opcode set to default to prep for next loop
