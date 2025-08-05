@@ -41,13 +41,13 @@ void print_reg_print_mem(){
    cout << "\n Registers \n";
    for (int i = 0; i< 32; i++){
 
-         cout << "r" << i << ": " << register_set[i] << "\n";
+         cout << "r" << i << ": " << register_set[i] << " ";
    }
 
    cout << "\n Memory \n";
    for (int i = 0; i< 200; i++){
 
-         cout << "[" << i << "]: " << program_memory[i] << "\n";
+         cout << "[" << i << "]: " << program_memory[i] << " ";
    }
 
    cout << "\n ################################## \n";
