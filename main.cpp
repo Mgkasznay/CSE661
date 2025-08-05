@@ -96,13 +96,13 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
          regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
          regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
 
+         valA = stoi(register_set[regIndexA]);
          valB = stoi(register_set[regIndexB]);
-         valC = stoi(register_set[regIndexC]);
 
-         result = valB - valC;
-         register_set[regIndexA] = to_string(result);
+         result = valA - valB;
+         register_set[regIndexC] = to_string(result);
 
-         cout << "SUB: " << register_set[regIndexB] << " - " << register_set[regIndexC] << " = " << result << " stored in " << regA << "\n";
+         cout << "SUB: " << register_set[regIndexA] << " - " << register_set[regIndexB] << " = " << result << " stored in " << regC << "\n";
 
          }
          break;
@@ -112,25 +112,54 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
          regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
          regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
 
+         valA = stoi(register_set[regIndexA]);
          valB = stoi(register_set[regIndexB]);
-         valC = stoi(register_set[regIndexC]);
 
-         result = valB * valC;
-         register_set[regIndexA] = to_string(result);
+         result = valB * valA;
+         register_set[regIndexC] = to_string(result);
 
-         cout << "MULT: " << register_set[regIndexB] << " * " << register_set[regIndexC] << " = " << result << " stored in " << regA << "\n";
+         cout << "MULT: " << register_set[regIndexA] << " * " << register_set[regIndexB] << " = " << result << " stored in " << regC << "\n";
 
          }
          break;
       case LES:
-         //Add Code Here
+         {
+         regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
+         regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
+         regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
+
+         valA = stoi(register_set[regIndexA]);
+         valB = stoi(register_set[regIndexB]);
+
+         bool comp = false;
+
+         if (valA < valB) comp = true;
+         register_set[regIndexC] = to_string(comp);
+
+         cout << "LES: " << register_set[regIndexA] << " < " << register_set[regIndexB] << " = " << comp << " stored in " << regC << "\n";
+
+         }
          break;
       case EQL:
-         //Add Code Here
+         {
+         regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
+         regIndexB = stoi(regB.substr(1)); //extract register number from regB and remove 'r'
+         regIndexC = stoi(regC.substr(1)); //extract register number from regC and remove 'r'
+
+         valA = stoi(register_set[regIndexA]);
+         valB = stoi(register_set[regIndexB]);
+
+         bool comp = false;
+
+         if (valA == valB) comp = true;
+         register_set[regIndexC] = to_string(comp);
+
+         cout << "EQL: " << register_set[regIndexA] << " == " << register_set[regIndexB] << " = " << comp << " stored in " << regC << "\n";
+
+         }
          break;
       case LW:
-         /*{
-         //Add Code Here
+         {
             regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
             int ptrIndex = stoi(ptr.substr(1)); //gets the register index for the pointer and removes 'r'
             int offsetValue = stoi(offset); //parse the offset value
@@ -139,14 +168,13 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
             if (address >= 0 && address < 200) { //if the address is greater than or equal to 0 and less than 200, the declared memory size
                register_set[regIndexA] = program_memory[address]; 
               cout << "Loaded value " << register_set[regIndexA] << " from " << program_memory[address]
-                  << " into memory [" << address << "]\n";  //stores the value from regA in the calculated memory address
+                  << " into register " << regA << "\n";  //stores the value from regA in the calculated memory address
             } else {
                cerr << "Error: memory access out of bounds.\n";// else if it's out of bounds
             }
-         }*/
+         }
          break;
       case SW:{
-         //Add Code Here
             regIndexA = stoi(regA.substr(1)); //extract register number from regA and remove 'r'
             int ptrIndex = stoi(ptr.substr(1)); //gets the register index for the pointer and removes 'r'
             int offsetValue = stoi(offset); //parse the offset value
@@ -162,13 +190,11 @@ void generic_function(string opcode, string regA, string regB, string regC, stri
          }
          break;
       case HALT:{
-         //Add Code Here
          program_running = false; //set the main loop to false to stop the program
          cout << "Program halted.\n";
       }
          break;
       case NOP:{
-         //Add Code Here
          cout << "No operation performed.\n";
       }
          break;
